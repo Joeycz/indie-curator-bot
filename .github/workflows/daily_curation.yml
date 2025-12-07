@@ -29,6 +29,4 @@ jobs:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
         NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        APIFY_API_TOKEN: ${{ secrets.APIFY_API_TOKEN }}
-        TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
       run: python curator.py
