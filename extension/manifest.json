@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "Indie Curator - Twitter Sync",
+    "version": "1.0",
+    "description": "Sync Twitter Likes to your local Indie Curator Bot.",
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "*://twitter.com/*",
+        "*://x.com/*",
+        "http://localhost:5000/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "icons": {
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
+    }
+}

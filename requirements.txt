@@ -3,3 +3,6 @@ notion-client
 openai
 python-dateutil
 python-dotenv
+httpx
+flask
+flask-cors

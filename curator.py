@@ -14,6 +14,10 @@ load_dotenv()
 
 # --- 配置区域 ---
 
+# 运行频率配置
+TWITTER_FETCH_DAY = 0 # 0 = Monday, 6 = Sunday. 设置为 None 则每次都运行
+FORCE_TWITTER = os.environ.get("FORCE_TWITTER", "false").lower() == "true"
+
 # 在本地运行时，可以直接填入，但在 GitHub Actions 中会从环境变量读取
 
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
@@ -183,6 +187,7 @@ def main():
                 
             # 避免 API 速率限制
             time.sleep(2)
+
 
 
 if __name__ == "__main__":
