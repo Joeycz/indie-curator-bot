@@ -1,0 +1,5 @@
+feedparser
+notion-client
+openai
+python-dateutil
+python-dotenv
