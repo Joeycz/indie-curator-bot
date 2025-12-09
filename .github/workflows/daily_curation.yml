@@ -29,4 +29,6 @@ jobs:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
         NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        ARK_API_KEY: ${{ secrets.Ark_API_KEY }}
+        ARK_MODEL_ID: ${{ secrets.Ark_MODEL_ID }}
       run: python curator.py
