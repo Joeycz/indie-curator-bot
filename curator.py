@@ -8,6 +8,10 @@ from openai import OpenAI
 from notion_client import Client
 from dotenv import load_dotenv
 import httpx
+try:
+    from volcenginesdkarkruntime import Ark
+except ImportError:
+    Ark = None
 
 # 加载 .env 文件
 load_dotenv()
@@ -24,24 +28,52 @@ DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
 NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
 
-# 信源列表 (从 config 读取)
+# Volcano Ark Config
+ARK_API_KEY = os.environ.get("ARK_API_KEY")
+ARK_MODEL_ID = os.environ.get("ARK_MODEL_ID")
 
-def load_feeds():
-    """从 feeds.json 加载订阅列表"""
+
+
+def load_json_file(filename, default_value):
+    """通用 JSON 文件加载函数"""
     try:
-        with open("feeds.json", "r", encoding="utf-8") as f:
-            return json.load(f)
+        if os.path.exists(filename):
+            with open(filename, "r", encoding="utf-8") as f:
+                return json.load(f)
     except Exception as e:
-        print(f"无法加载 feeds.json: {e}")
-        return []
+        print(f"无法加载 {filename}: {e}")
+    return default_value
 
-RSS_FEEDS = load_feeds()
+CONFIG = load_json_file("config.json", {})
+
+# 优先级: config.json > auto
+LLM_PROVIDER = CONFIG.get("llm_provider", "auto").lower()
+
+# 信源列表 (从 config 读取)
+RSS_FEEDS = load_json_file("feeds.json", [])
 
 # --- 初始化 ---
 
 client = None
-if DEEPSEEK_API_KEY:
+MODEL_NAME = "deepseek-chat" # Default
+
+
+
+if LLM_PROVIDER == "volc" or (LLM_PROVIDER == "auto" and ARK_API_KEY and ARK_MODEL_ID):
+    print("使用 Volcano Ark API")
+    if not Ark:
+         print("错误: 未安装 volcengine-python-sdk[ark]。")
+    if not ARK_API_KEY or not ARK_MODEL_ID:
+        print("警告: 选择了 Volcano Ark 但缺少 ARK_API_KEY 或 ARK_MODEL_ID")
+    
+    # 使用官方 Ark SDK
+    client = Ark(api_key=ARK_API_KEY, base_url="https://ark.cn-beijing.volces.com/api/v3")
+    MODEL_NAME = ARK_MODEL_ID
+    
+elif LLM_PROVIDER == "deepseek" or (LLM_PROVIDER == "auto" and DEEPSEEK_API_KEY):
+    print("使用 DeepSeek API")
     client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+    MODEL_NAME = "deepseek-chat"
 
 if NOTION_API_KEY:
     notion = Client(auth=NOTION_API_KEY)
@@ -86,7 +118,7 @@ def analyze_content(title, summary, link):
 
     try:
         response = client.chat.completions.create(
-            model="deepseek-chat",
+            model=MODEL_NAME,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that outputs JSON."},
                 {"role": "user", "content": prompt}
@@ -152,7 +184,7 @@ def save_to_notion(item, analysis):
 # --- 主程序 ---
 
 def main():
-    print("开始运行 AI 选品程序 (DeepSeek 版)...")
+    print("开始运行 AI 选品程序 ...")
 
     for feed_url in RSS_FEEDS:
         print(f"正在抓取: {feed_url}")
