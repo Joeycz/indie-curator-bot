@@ -212,7 +212,7 @@ def main():
                 continue
 
             # 3. 筛选高分内容 (比如 > 7分)
-            if analysis['score'] >= 7:
+            if (analysis.get('score') or 0) >= 7:
                 save_to_notion(entry, analysis)
             else:
                 print(f"低分跳过 ({analysis['score']}分): {title}")
