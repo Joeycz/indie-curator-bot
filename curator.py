@@ -28,6 +28,9 @@ DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
 NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
 
+# Moonshot Config
+MOONSHOT_API_KEY = os.environ.get("MOONSHOT_API_KEY")
+
 # Volcano Ark Config
 ARK_API_KEY = os.environ.get("ARK_API_KEY")
 ARK_MODEL_ID = os.environ.get("ARK_MODEL_ID")
@@ -46,8 +49,8 @@ def load_json_file(filename, default_value):
 
 CONFIG = load_json_file("config.json", {})
 
-# 优先级: config.json > auto
-LLM_PROVIDER = CONFIG.get("llm_provider", "auto").lower()
+# 优先级: Env Var > config.json > auto
+LLM_PROVIDER = os.environ.get("LLM_PROVIDER", CONFIG.get("llm_provider", "auto")).lower()
 
 # 信源列表 (从 config 读取)
 RSS_FEEDS = load_json_file("feeds.json", [])
@@ -70,6 +73,11 @@ if LLM_PROVIDER == "volc" or (LLM_PROVIDER == "auto" and ARK_API_KEY and ARK_MOD
     client = Ark(api_key=ARK_API_KEY, base_url="https://ark.cn-beijing.volces.com/api/v3")
     MODEL_NAME = ARK_MODEL_ID
     
+elif LLM_PROVIDER == "moonshot" or (LLM_PROVIDER == "auto" and MOONSHOT_API_KEY):
+    print("使用 Moonshot API")
+    client = OpenAI(api_key=MOONSHOT_API_KEY, base_url="https://api.moonshot.cn/v1")
+    MODEL_NAME = "moonshot-v1-8k"
+
 elif LLM_PROVIDER == "deepseek" or (LLM_PROVIDER == "auto" and DEEPSEEK_API_KEY):
     print("使用 DeepSeek API")
     client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
