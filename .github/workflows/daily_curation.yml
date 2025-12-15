@@ -2,8 +2,8 @@ name: Daily AI Curation
 
 on:
   schedule:
-    # 每天 UTC 时间 00:00 运行 (相当于北京时间早上 8:00)
-    - cron: '0 0 * * *'
+    # 每周五 UTC 时间 22:00 运行 (相当于北京时间周五早上 6:00)
+    - cron: '0 22 * * 4'
   workflow_dispatch: # 允许手动点击按钮触发
 
 jobs:
